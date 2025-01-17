@@ -1,9 +1,9 @@
-from django.db import models
+# from django.db import models
 
 
-class Image(models.Model):
-    image = models.ImageField(upload_to='images/') 
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+# class Image(models.Model):
+#     image = models.ImageField(upload_to='images/') 
+#     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
 # Create your models here.
