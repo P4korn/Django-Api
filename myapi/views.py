@@ -1,11 +1,17 @@
 
+import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import boto3
 import os
 from django.conf import settings
+from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 
-@csrf_exempt
+# @csrf_exempt
 def hello_world_view(request):
     if request.method == 'GET':
         return JsonResponse({'message': 'Hello, World!'})
@@ -14,6 +20,7 @@ def hello_world_view(request):
 @csrf_exempt
 def upload_image(request):
     if request.method == 'POST' and request.FILES.get('image'):
+        
         uploaded_image = request.FILES['image']
 
         # Optional: Validate the file type
@@ -39,3 +46,40 @@ def upload_image(request):
             return JsonResponse({'error': f'Error saving image: {str(e)}'}, status=500)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@csrf_exempt
+def user_login(request):
+    if request.method == 'POST':
+
+        try:
+        
+            # Retrieve username and password from request body
+            username = request.POST["username"]
+            password = request.POST["password"]
+
+            # Authenticate the user against Active Directory
+            user = authenticate(username=username, password=password)
+
+            if user:
+                # If authentication is successful, generate JWT tokens
+                refresh = RefreshToken.for_user(user)
+
+                return Response(
+                    {
+                        "message": "Login successful",
+                        "refresh_token": str(refresh),
+                        "access_token": str(refresh.access_token),
+                    },
+                    status=status.HTTP_200_OK,
+            )
+            else:
+                # Authentication failed
+                return Response(
+                    {"message": "Invalid credentials. Please try again."},
+                    status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -126,6 +127,76 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_STORAGE_BUCKET_NAME = 'django-storage8'
-AWS_S3_REGION_NAME = 'ap-southeast-1'  # Region ของ S3 Bucket
+AWS_STORAGE_BUCKET_NAME = 'django-bucket1212'
+AWS_S3_REGION_NAME = 'ap-southeast-2'  # Region ของ S3 Bucket
 AWS_QUERYSTRING_AUTH = False
+
+
+
+from decouple import config
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
+
+# Load sensitive settings from environment variables
+AUTH_LDAP_SERVER_URI = config("LDAP_SERVER_URI")
+AUTH_LDAP_BIND_DN = config("LDAP_BIND_DN")
+AUTH_LDAP_BIND_PASSWORD = config("LDAP_BIND_PASSWORD")
+
+# Base search
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    config("LDAP_SEARCH_BASE"),
+    ldap.SCOPE_SUBTREE,
+    "(sAMAccountName=%(user)s)",
+)
+
+# Attribute and permissions mapping
+AUTH_LDAP_USER_ATTR_MAP = {
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+}
+
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+AUTH_LDAP_CREATE_USERS = True
+
+# Optional: Group handling
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+    "CN=Users,DC=diller,DC=com", ldap.SCOPE_SUBTREE, "(objectClass=group)"
+)
+AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    "is_staff": "CN=Staff,OU=Groups,DC=diller,DC=com",
+    "is_superuser": "CN=Admins,OU=Groups,DC=diller,DC=com",
+}
+
+AUTHENTICATION_BACKENDS = [
+    "django_auth_ldap.backend.LDAPBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# Logging for debugging
+import logging
+logger = logging.getLogger("django_auth_ldap")
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
+
+
+from decouple import config
+
+# JWT Settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(config("JWT_ACCESS_LIFETIME", default=60))),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=int(config("JWT_REFRESH_LIFETIME", default=1))),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+
+
