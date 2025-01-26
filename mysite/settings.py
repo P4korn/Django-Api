@@ -154,6 +154,8 @@ AUTH_LDAP_USER_ATTR_MAP = {
     "first_name": "givenName",
     "last_name": "sn",
     "email": "mail",
+    "username": "uid",
+    "password" : "userPassword"
 }
 
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
