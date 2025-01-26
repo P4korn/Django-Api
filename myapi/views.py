@@ -61,7 +61,8 @@ def user_login(request):
             # Authenticate the user against Active Directory
             # user = authenticate(username=username, password=password)
 
-            user = query_user(username=username, password=password)
+            # user = query_user(username=username, password=password)
+            user = ldap_search(username=username)
 
             if user:
                 # If authentication is successful, generate JWT tokens
@@ -105,11 +106,12 @@ def query_user(username, password):
                 'givenName',  
                 'sn',
                 'userPassword',   
-            ]
+            ],
+            time_limit=2
         )
         
-        # Display the results
-        if conn.entries:
+        # Display the resultsf
+        if conn.receive_timeout:
             user_details = conn.entries[0]
             user_password = conn.entries[5]
 
@@ -123,5 +125,37 @@ def query_user(username, password):
         
         conn.unbind()
 
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+def ldap_search(username):
+    try:
+        # Connect to the LDAP server
+        server = Server(config("LDAP_SERVER_URI"), get_info=ALL)
+        conn = Connection(server, config("LDAP_BIND_DN"), config("LDAP_BIND_PASSWORD"), auto_bind=True)
+
+        SEARCH_BASE = 'OU=groups,DC=diller,DC=com'  # Base DN for the search
+        SEARCH_FILTER = f'(sAMAccountName={username})'  # LDAP filter to search for the user
+        SEARCH_ATTRIBUTES = ['cn', 'sAMAccountName', 'mail', 'memberOf', 'userPassword']
+        
+        # Perform the search
+        conn.search(
+            search_base=SEARCH_BASE,
+            search_filter=SEARCH_FILTER,
+            attributes=SEARCH_ATTRIBUTES
+        )
+        
+        # Print the results
+        if conn.entries:
+            print("Search Results:")
+            for entry in conn.entries:
+                print(entry)
+        else:
+            print("No results found for the search filter.")
+        
+        # Unbind the connection
+        conn.unbind()
+    
     except Exception as e:
         print(f"An error occurred: {e}")
