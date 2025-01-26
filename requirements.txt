@@ -16,5 +16,5 @@ python-decouple==3.8
 django-auth-ldap==5.1.0
 python-ldap==3.4.3
 djangorestframework-simplejwt
-
+ldap3
 
