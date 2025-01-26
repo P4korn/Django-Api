@@ -151,11 +151,14 @@ def ldap_search(username):
             print("Search Results:")
             for entry in conn.entries:
                 print(entry)
+                # Unbind the connection
+            conn.unbind()
+            return True
         else:
             print("No results found for the search filter.")
+            return False
         
-        # Unbind the connection
-        conn.unbind()
+
     
     except Exception as e:
         print(f"An error occurred: {e}")
