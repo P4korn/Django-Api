@@ -65,20 +65,22 @@ def user_login(request):
             user = ldap_search(username=username)
 
             if user:
-                # If authentication is successful, generate JWT tokens
-                refresh = RefreshToken.for_user(user)
+                # # If authentication is successful, generate JWT tokens
+                # refresh = RefreshToken.for_user(user)
 
-                return Response(
-                    {
-                        "message": "Login successful",
-                        "refresh_token": str(refresh),
-                        "access_token": str(refresh.access_token),
-                    },
-                    status=status.HTTP_200_OK,
-            )
+                return JsonResponse({'message': 'Login successfully!'}, status=200)
+                # Response(
+                # #     {
+                # #         "message": "Login successful",
+                # #         "refresh_token": str(refresh),
+                # #         "access_token": str(refresh.access_token),
+                # #     },
+                #     # status=status.HTTP_200_OK,
+                  
+                # )
             else:
                 # Authentication failed
-                return Response(
+                return JsonResponse(
                     {"message": "Invalid credentials. Please try again."},
                     status=status.HTTP_401_UNAUTHORIZED,
             )
@@ -88,45 +90,6 @@ def user_login(request):
 
 from decouple import config
 from ldap3 import Server, Connection, ALL
-def query_user(username, password):
-    try:
-        # Connect to the Active Directory server
-        server = Server(config("LDAP_SERVER_URI"), get_info=ALL)
-        conn = Connection(server, config("LDAP_BIND_DN"), config("LDAP_BIND_PASSWORD"), auto_bind=True)
-        
-        # Search for the user in Active Directory
-        search_filter = f'(sAMAccountName={username})'
-        conn.search(
-            search_base=config("LDAP_BIND_DN"),
-            search_filter=search_filter,
-            attributes=[
-                'cn',  
-                'mail',  
-                'memberOf',  
-                'givenName',  
-                'sn',
-                'userPassword',   
-            ],
-            time_limit=2
-        )
-        
-        # Display the resultsf
-        if conn.receive_timeout:
-            user_details = conn.entries[0]
-            user_password = conn.entries[5]
-
-            if password == user_password :
-                print(f"User Details for {username}:\n{user_details}")
-                return True
-            else :
-                return True
-        else:
-            print(f"User {username} not found.")
-        
-        conn.unbind()
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
 
 
 def ldap_search(username):
