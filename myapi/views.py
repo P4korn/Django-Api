@@ -59,7 +59,9 @@ def user_login(request):
             password = request.POST["password"]
 
             # Authenticate the user against Active Directory
-            user = authenticate(username=username, password=password)
+            # user = authenticate(username=username, password=password)
+
+            user = query_user(username=username, password=password)
 
             if user:
                 # If authentication is successful, generate JWT tokens
@@ -83,3 +85,43 @@ def user_login(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
 
+from decouple import config
+from ldap3 import Server, Connection, ALL
+def query_user(username, password):
+    try:
+        # Connect to the Active Directory server
+        server = Server(config("LDAP_SERVER_URI"), get_info=ALL)
+        conn = Connection(server, config("LDAP_BIND_DN"), config("LDAP_BIND_PASSWORD"), auto_bind=True)
+        
+        # Search for the user in Active Directory
+        search_filter = f'(sAMAccountName={username})'
+        conn.search(
+            search_base=config("LDAP_BIND_DN"),
+            search_filter=search_filter,
+            attributes=[
+                'cn',  
+                'mail',  
+                'memberOf',  
+                'givenName',  
+                'sn',
+                'userPassword',   
+            ]
+        )
+        
+        # Display the results
+        if conn.entries:
+            user_details = conn.entries[0]
+            user_password = conn.entries[5]
+
+            if password == user_password :
+                print(f"User Details for {username}:\n{user_details}")
+                return True
+            else :
+                return True
+        else:
+            print(f"User {username} not found.")
+        
+        conn.unbind()
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
