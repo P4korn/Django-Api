@@ -22,7 +22,7 @@ def hello_world_view(request):
 def upload_image(request):
     if request.method == 'POST' and request.FILES.get('image'):
 
-        if request.POST["username"] or request.POST["password"] :
+        if not request.POST["username"] or not request.POST["password"] :
             return JsonResponse({"error": "Please insert username or password correctly"}, status=400)
         
         username = request.POST["username"]
@@ -64,7 +64,7 @@ def user_login(request):
 
         try:
 
-            if request.POST["username"] or request.POST["password"] :
+            if not request.POST["username"] or not request.POST["password"] :
                 return JsonResponse({"error": "Please insert username or password correctly"}, status=400)
         
             # Retrieve username and password from request body
