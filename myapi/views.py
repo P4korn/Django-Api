@@ -22,12 +22,12 @@ def hello_world_view(request):
 def upload_image(request):
     if request.method == 'POST' and request.FILES.get('image'):
 
-        if not request.POST["username"] or not request.POST["password"] :
-            return JsonResponse({"error": "Please insert username or password correctly"}, status=400)
-        
         username = request.POST["username"]
         password = request.POST["password"]
 
+        if not username or not password :
+            return JsonResponse({"error": "Please insert username or password correctly"}, status=400)
+        
         user = ldap_search(username=username, password=password)
 
         if not user :
@@ -63,13 +63,11 @@ def user_login(request):
     if request.method == 'POST':
 
         try:
+            username = request.POST["username"]
+            password = request.POST["password"]
 
-            if request.POST["username"] and request.POST["password"] :
+            if username and password :
         
-                # Retrieve username and password from request body
-                username = request.POST["username"]
-                password = request.POST["password"]
-
                 # Authenticate the user against Active Directory
                 user = ldap_search(username=username, password=password)
 
