@@ -26,7 +26,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
            
           sudo su
-          
+
           cd Django-Api && git pull
 
           # Build and run the Docker container
@@ -34,5 +34,13 @@ jobs:
           docker build -t django-api .
           docker stop docker-api-container || true
           docker rm docker-api-container || true
-          docker run -e LDAP_SERVER_URI=${{ secrets.LDAP_SERVER_URI}} -e LDAP_BIND_DN=${{ secrets.LDAP_BIND_DN}} -e LDAP_BIND_PASSWORD=${{ secrets.LDAP_BIND_PASSWORD}} -e LDAP_SEARCH_BASE=${{ secrets.LDAP_SEARCH_BASE}} -p 8000:8000 django-api
+          
+          docker run -d \
+            --name docker-api-container \
+            -e LDAP_SERVER_URI=${{ secrets.LDAP_SERVER_URI }} \
+            -e LDAP_BIND_DN=${{ secrets.LDAP_BIND_DN }} \
+            -e LDAP_BIND_PASSWORD=${{ secrets.LDAP_BIND_PASSWORD }} \
+            -e LDAP_SEARCH_BASE=${{ secrets.LDAP_SEARCH_BASE }} \
+            -p 8000:8000 django-api
+
           EOF
