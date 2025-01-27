@@ -121,8 +121,6 @@ def ldap_search(username, password):
             sAMAccountName = entry.sAMAccountName
             userPassword = entry.userPassword
 
-            
-
             if username != sAMAccountName :
                 return False
             
