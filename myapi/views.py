@@ -107,22 +107,19 @@ def ldap_search(username, password):
             search_filter=SEARCH_FILTER,
             attributes=SEARCH_ATTRIBUTES
         )
-        
+      
         # Print the results
         if conn.entries:
             
             entry = conn.entries[0]
 
             sAMAccountName = entry.sAMAccountName
-            userPassword = entry.userPassword
-
-            print("sAMAccountName : " + str(sAMAccountName))
-            print("userPassword : "+ str(userPassword , 'utf-8'))
+            userPassword = str(entry.userPassword)
 
             if username != str(sAMAccountName) :
                 return False
             
-            if password != str(userPassword , 'utf-8') :
+            if password != userPassword[2: len(userPassword)-1] :
                 return False
             
             conn.unbind()
