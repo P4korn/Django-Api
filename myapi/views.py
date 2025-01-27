@@ -3,13 +3,14 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import boto3
-import os
 from django.conf import settings
-from django.contrib.auth import authenticate
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
+from decouple import config
+from ldap3 import Server, Connection, ALL
+# from django.contrib.auth import authenticate
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from rest_framework_simplejwt.tokens import RefreshToken
 
 # @csrf_exempt
 def hello_world_view(request):
@@ -20,14 +21,23 @@ def hello_world_view(request):
 @csrf_exempt
 def upload_image(request):
     if request.method == 'POST' and request.FILES.get('image'):
+
+        if request.POST["username"] or request.POST["password"] :
+            return JsonResponse({"error": "Please insert username or password correctly"}, status=400)
+        
+        username = request.POST["username"]
+        password = request.POST["password"]
+
+        user = ldap_search(username=username, password=password)
+
+        if not user :
+            return JsonResponse({'message': 'Invalid Credential'}, status=401)
         
         uploaded_image = request.FILES['image']
 
-        # Optional: Validate the file type
         if not uploaded_image.name.endswith(('jpg', 'jpeg', 'png')):
             return JsonResponse({'error': 'File type not supported'}, status=400)
 
-        # Upload the image to S3
         try:
             # Using IAM role credentials automatically
             s3_client = boto3.client('s3')
@@ -53,16 +63,16 @@ def user_login(request):
     if request.method == 'POST':
 
         try:
+
+            if request.POST["username"] or request.POST["password"] :
+                return JsonResponse({"error": "Please insert username or password correctly"}, status=400)
         
             # Retrieve username and password from request body
             username = request.POST["username"]
             password = request.POST["password"]
 
             # Authenticate the user against Active Directory
-            # user = authenticate(username=username, password=password)
-
-            # user = query_user(username=username, password=password)
-            user = ldap_search(username=username)
+            user = ldap_search(username=username, password=password)
 
             if user:
                 # # If authentication is successful, generate JWT tokens
@@ -76,23 +86,16 @@ def user_login(request):
                 # #         "access_token": str(refresh.access_token),
                 # #     },
                 #     # status=status.HTTP_200_OK,
-                  
                 # )
             else:
-                # Authentication failed
-                return JsonResponse(
-                    {"message": "Invalid credentials. Please try again."},
-                    status=status.HTTP_401_UNAUTHORIZED,
-            )
+                return JsonResponse({'message': 'Invalid Credential'}, status=401)
+            
 
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
-
-from decouple import config
-from ldap3 import Server, Connection, ALL
-
-
-def ldap_search(username):
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return JsonResponse({"error": "Internal Server Error"}, status=500)
+        
+def ldap_search(username, password):
     try:
         # Connect to the LDAP server
         server = Server(config("LDAP_SERVER_URI"), get_info=ALL)
@@ -111,17 +114,29 @@ def ldap_search(username):
         
         # Print the results
         if conn.entries:
-            print("Search Results:")
-            for entry in conn.entries:
-                print(entry)
-                # Unbind the connection
+            
+            entry = conn.entries[0]
+
+            sAMAccountName = entry.sAMAccountName
+            userPassword = entry.userPassword
+
+            
+
+            if username != sAMAccountName :
+                return False
+            
+            if password != userPassword :
+                return False
+            
             conn.unbind()
             return True
+        
         else:
-            print("No results found for the search filter.")
             return False
         
-
-    
     except Exception as e:
         print(f"An error occurred: {e}")
+
+
+
+
