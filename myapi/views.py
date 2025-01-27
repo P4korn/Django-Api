@@ -64,32 +64,33 @@ def user_login(request):
 
         try:
 
-            if not request.POST["username"] or not request.POST["password"] :
-                return JsonResponse({"error": "Please insert username or password correctly"}, status=400)
+            if request.POST["username"] and request.POST["password"] :
         
-            # Retrieve username and password from request body
-            username = request.POST["username"]
-            password = request.POST["password"]
+                # Retrieve username and password from request body
+                username = request.POST["username"]
+                password = request.POST["password"]
 
-            # Authenticate the user against Active Directory
-            user = ldap_search(username=username, password=password)
+                # Authenticate the user against Active Directory
+                user = ldap_search(username=username, password=password)
 
-            if user:
-                # # If authentication is successful, generate JWT tokens
-                # refresh = RefreshToken.for_user(user)
+                if user:
+                    # # If authentication is successful, generate JWT tokens
+                    # refresh = RefreshToken.for_user(user)
 
-                return JsonResponse({'message': 'Login successfully!'}, status=200)
-                # Response(
-                # #     {
-                # #         "message": "Login successful",
-                # #         "refresh_token": str(refresh),
-                # #         "access_token": str(refresh.access_token),
-                # #     },
-                #     # status=status.HTTP_200_OK,
-                # )
-            else:
-                return JsonResponse({'message': 'Invalid Credential'}, status=401)
-            
+                    return JsonResponse({'message': 'Login successfully!'}, status=200)
+                    # Response(
+                    # #     {
+                    # #         "message": "Login successful",
+                    # #         "refresh_token": str(refresh),
+                    # #         "access_token": str(refresh.access_token),
+                    # #     },
+                    #     # status=status.HTTP_200_OK,
+                    # )
+                else :
+                    return JsonResponse({'message': 'Invalid Credential'}, status=401)
+                
+            else :
+                return JsonResponse({"error": "Please insert username or password correctly"}, status=400)    
 
         except Exception as e:
             print(f"An error occurred: {e}")
