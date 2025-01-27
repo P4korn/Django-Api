@@ -1,0 +1,36 @@
+name: Deploy to Docker on Linux EC2
+
+on:
+  push:
+    branches:
+      - master  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH agent
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_KEY }}
+
+      # Step 3: Deploy to Linux/Unix EC2
+      - name: Deploy and Run Docker
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            
+          cd /ec2/Django-Api && git pull
+
+          # Build and run the Docker container
+          cd Django-Api
+          docker build -t django-api .
+          docker stop docker-api-container || true
+          docker rm docker-api-container || true
+          docker run -e LDAP_SERVER_URI=${{ secrets.LDAP_SERVER_URI}} -e LDAP_BIND_DN=${{ secrets.LDAP_BIND_DN}} -e LDAP_BIND_PASSWORD=${{ secrets.LDAP_BIND_PASSWORD}} -e LDAP_SEARCH_BASE=${{ secrets.LDAP_SEARCH_BASE}} -p 8000:8000 django-api
+          EOF
