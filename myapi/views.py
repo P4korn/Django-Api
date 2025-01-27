@@ -66,8 +66,13 @@ def user_login(request):
             username = request.POST["username"]
             password = request.POST["password"]
 
-            if username and password :
-        
+
+
+            if username & password :
+
+
+                print("username : " + username)
+                print("password : " + password)
                 # Authenticate the user against Active Directory
                 user = ldap_search(username=username, password=password)
 
