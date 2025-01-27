@@ -63,13 +63,10 @@ def user_login(request):
     if request.method == 'POST':
 
         try:
-            username = request.POST["username"]
-            password = request.POST["password"]
+            username = request.POST["username"] if request.POST["username"] else False
+            password = request.POST["password"] if request.POST["password"] else False
 
-
-
-            if username & password :
-
+            if username and password :
 
                 print("username : " + username)
                 print("password : " + password)
