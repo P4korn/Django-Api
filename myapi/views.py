@@ -22,15 +22,12 @@ def hello_world_view(request):
 def upload_image(request):
     if request.method == 'POST' and request.FILES.get('image'):
 
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.headers.get("username")
+        password = request.headers.get("password")
 
-        if not username or not password :
-            return JsonResponse({"error": "Please insert username or password correctly"}, status=400)
-        
         user = ldap_search(username=username, password=password)
 
-        if not user :
+        if user == False :
             return JsonResponse({'message': 'Invalid Credential'}, status=401)
         
         uploaded_image = request.FILES['image']
@@ -113,18 +110,17 @@ def ldap_search(username, password):
             
             entry = conn.entries[0]
 
-            sAMAccountName = entry.sAMAccountName
-            userPassword = str(entry.userPassword)
+            sAMAccountName = str(entry.sAMAccountName)
+            userPassword = entry.userPassword
 
-            if username != str(sAMAccountName) :
+            if username != sAMAccountName :
                 return False
-            
+
             if password != userPassword[2: len(userPassword)-1] :
                 return False
             
             conn.unbind()
             return True
-        
         else:
             return False
         
