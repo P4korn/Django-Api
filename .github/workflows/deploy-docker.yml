@@ -29,8 +29,6 @@ jobs:
 
           cd Django-Api && git pull
 
-          cd Django-Api
-
           docker build -t django-api .
 
           docker stop docker-api-container || true
