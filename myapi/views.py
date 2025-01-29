@@ -25,17 +25,20 @@ def upload_image(request):
         username = request.headers.get("username")
         password = request.headers.get("password")
 
-        user = ldap_search(username=username, password=password)
-
-        if user == False :
-            return JsonResponse({'message': 'Invalid Credential'}, status=401)
         
-        uploaded_image = request.FILES['image']
-
-        if not uploaded_image.name.endswith(('jpg', 'jpeg', 'png')):
-            return JsonResponse({'error': 'File type not supported'}, status=400)
 
         try:
+
+            user = ldap_search(username=username, password=password)
+
+            if user == False :
+                return JsonResponse({'message': 'Invalid Credential'}, status=401)
+            
+            uploaded_image = request.FILES['image']
+
+            if not uploaded_image.name.endswith(('jpg', 'jpeg', 'png')):
+                return JsonResponse({'error': 'File type not supported'}, status=400)
+            
             # Using IAM role credentials automatically
             s3_client = boto3.client('s3')
 
@@ -111,7 +114,7 @@ def ldap_search(username, password):
             entry = conn.entries[0]
 
             sAMAccountName = str(entry.sAMAccountName)
-            userPassword = entry.userPassword
+            userPassword = str(entry.userPassword)
 
             if username != sAMAccountName :
                 return False
