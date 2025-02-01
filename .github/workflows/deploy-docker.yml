@@ -27,6 +27,16 @@ jobs:
            
           sudo su
 
+          cd fluentd
+
+          docker container run -d --name fluentdserver --rm -it \
+          -p 24224:24224 \
+          -v $(pwd)/docker.conf:/fluentd/etc/docker.conf \
+          -e FLUENTD_CONF=docker.conf \
+          fluent/fluentd:v1.16.7-debian-1.1
+
+          cd ..
+          
           cd Django-Api && git pull
 
           docker build -t django-api .
@@ -37,6 +47,8 @@ jobs:
           
           docker run -d \
             --name docker-api-container \
+            --log-driver=fluentd  \
+            --log-opt tag="{{.ImageName}}/{{.Name}}/{{.ID}}" \
             -e LDAP_SERVER_URI=${{ secrets.LDAP_SERVER_URI }} \
             -e LDAP_BIND_DN=${{ secrets.LDAP_BIND_DN }} \
             -e LDAP_BIND_PASSWORD=${{ secrets.LDAP_BIND_PASSWORD }} \
