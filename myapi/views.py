@@ -125,7 +125,7 @@ def ldap_search(username, password):
             return False
         
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred : {e}")
 
 
 
