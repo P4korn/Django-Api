@@ -25,8 +25,7 @@ def upload_image(request):
         username = request.headers.get("username")
         password = request.headers.get("password")
 
-        
-
+    
         try:
 
             user = ldap_search(username=username, password=password)
@@ -66,8 +65,6 @@ def user_login(request):
             username = request.headers.get("username")
             password = request.headers.get("password")
 
-            print("username : " + username)
-            print("password : " + password)
             # Authenticate the user against Active Directory
             user = ldap_search(username=username, password=password)
 
