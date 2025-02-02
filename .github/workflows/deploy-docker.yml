@@ -26,7 +26,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
            
           sudo su
-
           cd fluentd
 
           docker stop fluentdserver || true
