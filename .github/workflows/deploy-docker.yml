@@ -10,17 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
+      
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Set up SSH agent
+   
       - name: Set up SSH Agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.EC2_KEY }}
 
-      # Step 3: Deploy to Linux/Unix EC2
       - name: Deploy and Run Docker
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
@@ -28,7 +27,7 @@ jobs:
           sudo su
           
           cd Django-Api
-            
+
           git reset --hard origin/main 
 
           git pull origin main

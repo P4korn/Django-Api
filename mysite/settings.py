@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "mysite.middleware.AddRemoteIPFilter"
+    "mysite.middleware.custom_middleware.LogIPMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -52,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
 
 ROOT_URLCONF = "mysite.urls"
 
@@ -87,30 +88,15 @@ DATABASES = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "[%(asctime)s] %(levelname)s %(message)s - %(remote_ip)s",
-        },
-    },
-    "filters": {
-        "add_remote_ip": {
-            "()": "path.to.your.module.AddRemoteIPFilter",
-        },
-    },
     "handlers": {
-        "file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "django_requests.log",
-            "formatter": "verbose",
-            "filters": ["add_remote_ip"],
+        "console": {
+            "class": "logging.StreamHandler",
         },
     },
     "loggers": {
-        "django.server": {
-            "handlers": ["file"],
+        "django": {
+            "handlers": ["console"],
             "level": "INFO",
-            "propagate": False,
         },
     },
 }
