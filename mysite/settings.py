@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "mysite.middleware.AddRemoteIPFilter"
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -83,24 +84,36 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[%(asctime)s] %(levelname)s %(message)s - %(remote_ip)s",
+        },
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    "filters": {
+        "add_remote_ip": {
+            "()": "path.to.your.module.AddRemoteIPFilter",
+        },
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "django_requests.log",
+            "formatter": "verbose",
+            "filters": ["add_remote_ip"],
+        },
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    "loggers": {
+        "django.server": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
-]
+}
 
 
 # Internationalization
