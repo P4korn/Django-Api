@@ -26,19 +26,12 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
            
           sudo su
-          cd fluentd
-
-          docker stop fluentdserver || true
-
-          docker container run -d --name fluentdserver --rm -it \
-          -p 24224:24224 \
-          -v $(pwd)/docker.conf:/fluentd/etc/docker.conf \
-          -e FLUENTD_CONF=docker.conf \
-          fluentd-image:v1
-
-          cd ..
           
-          cd Django-Api && git pull
+          cd Django-Api
+            
+          git reset --hard origin/main 
+
+          git pull origin main
 
           docker build -t django-api .
 
