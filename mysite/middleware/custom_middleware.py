@@ -1,15 +1,17 @@
 import logging
 
-logger = logging.getLogger(__name__)
-
 class LogIPMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        self.logger = logging.getLogger("django")  # Use Django's logger
 
     def __call__(self, request):
         ip = self.get_client_ip(request)
-        print(f"Client IP: {ip}")  # Debugging
         response = self.get_response(request)
+
+        # Log everything in one line
+        self.logger.info(f'Client IP: {ip} | {request.method} {request.path} | Status: {response.status_code}')
+        
         return response
 
     def get_client_ip(self, request):

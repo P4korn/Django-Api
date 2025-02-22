@@ -90,16 +90,28 @@ LOGGING = {
     "disable_existing_loggers": False,
     "handlers": {
         "console": {
+            "level": "INFO",
             "class": "logging.StreamHandler",
+            "formatter": "detailed",
+        },
+    },
+    "formatters": {
+        "detailed": {
+            "format": "%(asctime)s | %(levelname)s | %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
     "loggers": {
         "django": {
-            "handlers": ["console"],
+            "handlers": ["console"], 
             "level": "INFO",
+            "propagate": False,
         },
     },
 }
+
+import logging
+logging.getLogger("django.server").propagate = False
 
 
 # Internationalization
