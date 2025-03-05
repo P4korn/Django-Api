@@ -32,6 +32,8 @@ jobs:
 
           git pull origin master
 
+          docker system prune -a
+
           docker build -t django-api .
 
           docker stop docker-api-container || true
