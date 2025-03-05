@@ -26,9 +26,9 @@ jobs:
            
           sudo su
 
-          mkdir Django-api
+          git clone https://github.com/P4korn/Django-Api.git
 
-          cd Django-api
+          cd Django-Api 
 
           git reset --hard origin/master 
 
