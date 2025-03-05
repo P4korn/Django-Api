@@ -40,12 +40,6 @@ jobs:
           
           docker run -d \
             --name docker-api-container \
-            --log-driver=fluentd  \
-            --log-opt tag="{{.ImageName}}/{{.Name}}/{{.ID}}" \
-            -e LDAP_SERVER_URI=${{ secrets.LDAP_SERVER_URI }} \
-            -e LDAP_BIND_DN=${{ secrets.LDAP_BIND_DN }} \
-            -e LDAP_BIND_PASSWORD=${{ secrets.LDAP_BIND_PASSWORD }} \
-            -e LDAP_SEARCH_BASE=${{ secrets.LDAP_SEARCH_BASE }} \
             -p 8000:8000 django-api
 
           EOF
