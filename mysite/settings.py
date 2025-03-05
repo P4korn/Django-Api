@@ -144,54 +144,9 @@ AWS_QUERYSTRING_AUTH = False
 
 
 
-# from decouple import config
-# import ldap
-# from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
-
-# # Load sensitive settings from environment variables
-# AUTH_LDAP_SERVER_URI = config("LDAP_SERVER_URI")
-# AUTH_LDAP_BIND_DN = config("LDAP_BIND_DN")
-# AUTH_LDAP_BIND_PASSWORD = config("LDAP_BIND_PASSWORD")
-
-# Base search
-# AUTH_LDAP_USER_SEARCH = LDAPSearch(
-#     config("LDAP_SEARCH_BASE"),
-#     ldap.SCOPE_SUBTREE,
-#     "(sAMAccountName=%(user)s)",
-# )
-
-# # Attribute and permissions mapping
-# AUTH_LDAP_USER_ATTR_MAP = {
-#     "first_name": "givenName",
-#     "last_name": "sn",
-#     "email": "mail",
-#     "username": "uid",
-#     "password" : "userPassword"
-# }
-
-# AUTH_LDAP_ALWAYS_UPDATE_USER = True
-# AUTH_LDAP_CREATE_USERS = True
-
-# # Optional: Group handling
-# AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
-#     "CN=Users,DC=diller,DC=com", ldap.SCOPE_SUBTREE, "(objectClass=group)"
-# )
-# AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
-
-# AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-#     "is_staff": "CN=Staff,OU=Groups,DC=diller,DC=com",
-#     "is_superuser": "CN=Admins,OU=Groups,DC=diller,DC=com",
-# }
-
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
-
-# Logging for debugging
-# import logging
-# logger = logging.getLogger("django_auth_ldap")
-# logger.addHandler(logging.StreamHandler())
-# logger.setLevel(logging.DEBUG)
 
 
 
