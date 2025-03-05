@@ -40,6 +40,7 @@ jobs:
           
           docker run -d \
             --name docker-api-container \
-            -p 8000:8000 django-api
+            -p 8000:8000 \
+            django-api
 
           EOF
