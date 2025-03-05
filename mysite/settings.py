@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-f&j(7v4r0g0wv50e@827p1_dqx)!=on@8i_0fn0@_e6+)h=4bx"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "myapi",
-    "rest_framework"
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +129,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -144,58 +144,56 @@ AWS_QUERYSTRING_AUTH = False
 
 
 
-from decouple import config
-import ldap
-from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
+# from decouple import config
+# import ldap
+# from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
-# Load sensitive settings from environment variables
-AUTH_LDAP_SERVER_URI = config("LDAP_SERVER_URI")
-AUTH_LDAP_BIND_DN = config("LDAP_BIND_DN")
-AUTH_LDAP_BIND_PASSWORD = config("LDAP_BIND_PASSWORD")
+# # Load sensitive settings from environment variables
+# AUTH_LDAP_SERVER_URI = config("LDAP_SERVER_URI")
+# AUTH_LDAP_BIND_DN = config("LDAP_BIND_DN")
+# AUTH_LDAP_BIND_PASSWORD = config("LDAP_BIND_PASSWORD")
 
 # Base search
-AUTH_LDAP_USER_SEARCH = LDAPSearch(
-    config("LDAP_SEARCH_BASE"),
-    ldap.SCOPE_SUBTREE,
-    "(sAMAccountName=%(user)s)",
-)
+# AUTH_LDAP_USER_SEARCH = LDAPSearch(
+#     config("LDAP_SEARCH_BASE"),
+#     ldap.SCOPE_SUBTREE,
+#     "(sAMAccountName=%(user)s)",
+# )
 
-# Attribute and permissions mapping
-AUTH_LDAP_USER_ATTR_MAP = {
-    "first_name": "givenName",
-    "last_name": "sn",
-    "email": "mail",
-    "username": "uid",
-    "password" : "userPassword"
-}
+# # Attribute and permissions mapping
+# AUTH_LDAP_USER_ATTR_MAP = {
+#     "first_name": "givenName",
+#     "last_name": "sn",
+#     "email": "mail",
+#     "username": "uid",
+#     "password" : "userPassword"
+# }
 
-AUTH_LDAP_ALWAYS_UPDATE_USER = True
-AUTH_LDAP_CREATE_USERS = True
+# AUTH_LDAP_ALWAYS_UPDATE_USER = True
+# AUTH_LDAP_CREATE_USERS = True
 
-# Optional: Group handling
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
-    "CN=Users,DC=diller,DC=com", ldap.SCOPE_SUBTREE, "(objectClass=group)"
-)
-AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+# # Optional: Group handling
+# AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+#     "CN=Users,DC=diller,DC=com", ldap.SCOPE_SUBTREE, "(objectClass=group)"
+# )
+# AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
 
-AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-    "is_staff": "CN=Staff,OU=Groups,DC=diller,DC=com",
-    "is_superuser": "CN=Admins,OU=Groups,DC=diller,DC=com",
-}
+# AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+#     "is_staff": "CN=Staff,OU=Groups,DC=diller,DC=com",
+#     "is_superuser": "CN=Admins,OU=Groups,DC=diller,DC=com",
+# }
 
 AUTHENTICATION_BACKENDS = [
-    "django_auth_ldap.backend.LDAPBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
 
 # Logging for debugging
-import logging
-logger = logging.getLogger("django_auth_ldap")
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
+# import logging
+# logger = logging.getLogger("django_auth_ldap")
+# logger.addHandler(logging.StreamHandler())
+# logger.setLevel(logging.DEBUG)
 
 
-from decouple import config
 
 # JWT Settings
 REST_FRAMEWORK = {
@@ -205,8 +203,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(config("JWT_ACCESS_LIFETIME", default=60))),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=int(config("JWT_REFRESH_LIFETIME", default=1))),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
