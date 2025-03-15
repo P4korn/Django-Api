@@ -42,6 +42,8 @@ jobs:
           
           docker run -d \
             --name docker-api-container \
+            --log-driver=fluentd  \
+            --log-opt tag="{{.ImageName}}/{{.Name}}/{{.ID}}" \
             -p 8000:8000 \
             django-api
 
