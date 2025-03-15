@@ -40,6 +40,7 @@ jobs:
 
           docker rm docker-api-container || true
           
+          
           docker run -d \
             --name docker-api-container \
             --log-driver=fluentd  \
